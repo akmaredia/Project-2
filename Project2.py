@@ -10,6 +10,7 @@
 ###########
 
 ## Import statements
+
 import unittest
 import json
 import requests
@@ -17,7 +18,6 @@ import tweepy
 import aziz_twitter_info # Requires you to have a twitter_info file in this directory
 import re
 from bs4 import BeautifulSoup
-
 
 ## Tweepy authentication setup
 ## Fill these in in the twitter_info.py file
@@ -84,7 +84,7 @@ def get_umsi_data():
 			r = requests.get(base_url + str(i), headers = {'User-Agent': 'SI_CLASS'})
 			html_data.append(r.text)
 		
-		CACHE_DICTION[unique_identifier] = htmlDoc
+		CACHE_DICTION[unique_identifier] = html_data
 		cache_file = open(cache_data, 'w', encoding = 'utf-8')
 		cache_file.write(json.dumps(CACHE_DICTION))
 		cache_file.close()
