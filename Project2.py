@@ -55,8 +55,8 @@ except:
 ## find_urls("I love looking at websites like http://etsy.com and http://instagram.com and stuff") should return ["http://etsy.com","http://instagram.com"]
 ## find_urls("the internet is awesome #worldwideweb") should return [], empty list
 
-def find_urls(strng):
-	found_urls = re.findall(r'https?:\/\/[A-Za-z0-9]{2,}(?:\.[A-Za-z0-9]{1,})+', strng)
+def find_urls(string):
+	found_urls = re.findall(r'https?:\/\/[A-Za-z0-9]{2,}(?:\.[A-Za-z0-9]{1,})+', string)
 	return found_urls
 
 ## PART 2 (a) - Define a function called get_umsi_data.
@@ -71,32 +71,39 @@ def find_urls(strng):
 
 def get_umsi_data():
 	
-	html_data = []
 	unique_identifier = "umsi_directory_data"
 	
 	if unique_identifier in CACHE_DICTION:
 		return CACHE_DICTION[unique_identifier]
 	
 	else:
+		html_data = []
+
 		for i in range(12):
-			
-			base_url = "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All"
-			
-			r = requests.get(base_url, headers={'User-Agent': 'SI_Class'})
+			base_url = "https://www.si.umich.edu/directory?field_person_firstname_value=&field_person_lastname_value=&rid=All&page="
+			r = requests.get(base_url + str(i), headers = {'User-Agent': 'SI_CLASS'})
 			html_data.append(r.text)
 		
-		CACHE_DICTION[unique_identifier] = html_data
-		
-		f = open(cache_data, 'w')
-		f.write(json.dumps(CACHE_DICTION))
-		f.close()
-		
-		return CACHE_DICTION[unique_identifier]
+		CACHE_DICTION[unique_identifier] = htmlDoc
+		cache_file = open(cache_data, 'w', encoding = 'utf-8')
+		cache_file.write(json.dumps(CACHE_DICTION))
+		cache_file.close()
+		return html_data
 
 ## PART 2 (b) - Create a dictionary saved in a variable umsi_titles 
 ## whose keys are UMSI people's names, and whose associated values are those people's titles, e.g. "PhD student" or "Associate Professor of Information"...
 
+page = get_umsi_data()
+umsi_titles = {}
 
+for i in range(len(page)):
+	soup = BeautifulSoup(page[i], "html.parser")
+	people = soup.find_all("div", {"class":"views-row"})
+
+	for person in people:
+		name = person.find(property = "dc:title")
+		title = person.find("div", attrs = {'class':'field-name-field-person-titles'})
+		umsi_titles[name.page] = title.page
 
 ## PART 3 (a) - Define a function get_five_tweets
 ## INPUT: Any string
